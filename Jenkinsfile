@@ -116,19 +116,17 @@ pipeline {
          * 7. DEPLOY MAVEN ARTIFACT TO NEXUS
          */
         stage('Deploy to Nexus') {
-            steps {
-                withMaven(
-                    jdk: 'jdk21',
-                    maven: 'maven3',
-                    traceability: true
-                ) {
-                    sh '''
-                        mvn deploy
-                    '''
-                }
-            }
+    steps {
+        withMaven(
+            jdk: 'jdk21',
+            maven: 'maven3',
+            mavenSettingsConfig: 'nexus-settings',
+            traceability: true
+        ) {
+            sh 'mvn deploy'
         }
-
+    }
+}
         /*
          * 8. BUILD DOCKER IMAGE
          */
