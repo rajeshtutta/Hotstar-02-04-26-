@@ -77,6 +77,21 @@ pipeline {
             }
         }
 
+        stage('Check Plexus Dependency') {
+    steps {
+        withMaven(
+            jdk: 'jdk21',
+            maven: 'maven3',
+            mavenSettingsConfig: 'nexus-settings'
+        ) {
+            sh '''
+                echo "========== PLEXUS DEPENDENCY =========="
+                mvn dependency:tree -Dincludes=org.codehaus.plexus:plexus-utils
+            '''
+        }
+    }
+}
+
         /*
          * 4. UNIT TEST
          */
