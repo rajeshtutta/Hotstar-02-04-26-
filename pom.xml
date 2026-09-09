@@ -21,21 +21,29 @@
         <sonar.login>${env.SONAR_AUTH_TOKEN}</sonar.login>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.oracle.bedrock</groupId>
-            <artifactId>bedrock-runtime-maven</artifactId>
-            <version>5.1.2</version>
-        </dependency>
+<dependencies>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <dependency>
+        <groupId>com.oracle.bedrock</groupId>
+        <artifactId>bedrock-runtime-maven</artifactId>
+        <version>5.1.2</version>
+    </dependency>
 
+    <!-- Override vulnerable transitive plexus-utils 3.0.22 -->
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.6.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+    </dependency>
+
+</dependencies>
     <build>
         <finalName>myapp</finalName>
         <plugins>
