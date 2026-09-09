@@ -1,9 +1,13 @@
-
 pipeline {
     agent any
-
+    
+    tools {
+        maven 'maven3'
+        jdk 'jdk21'
+    }
+    
     environment {
-        SONARQUBE_ENV = 'sq'
+        SONARQUBE_ENV = 'sq_token'
         DOCKER_IMAGE = "rajeshtutta123/rajesh_hotstar-02-04-26"
         AWS_CREDS = credentials('aws_creds')
         AWS_DEFAULT_REGION = 'ap-south-1b'
