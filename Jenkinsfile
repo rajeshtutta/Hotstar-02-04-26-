@@ -229,6 +229,66 @@ pipeline {
             }
         }
 
+             /*
+ * 13. CREATE / VERIFY EKS CLUSTER
+ */
+stage('Create / Verify EKS Cluster') {
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+    }
+
+    steps {
+
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'aws_creds',
+                usernameVariable: 'AWS_ACCESS_KEY_ID',
+                passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+        ]) {
+
+            sh '''
+                set -e
+
+                echo "========================================="
+                echo "       CHECKING EKS CLUSTER"
+                echo "========================================="
+
+                if aws eks describe-cluster \
+                    --region ${AWS_DEFAULT_REGION} \
+                    --name ${EKS_CLUSTER} > /dev/null 2>&1
+                then
+                    echo "EKS cluster ${EKS_CLUSTER} already exists."
+                    echo "Skipping cluster creation."
+
+                else
+                    echo "EKS cluster ${EKS_CLUSTER} does not exist."
+                    echo "Creating EKS cluster..."
+
+                    eksctl create cluster \
+                        --name ${EKS_CLUSTER} \
+                        --region ${AWS_DEFAULT_REGION} \
+                        --nodes 2 \
+                        --node-type t3.medium \
+                        --managed
+
+                    echo "EKS cluster creation completed."
+                fi
+
+                echo ""
+                echo "Verifying EKS cluster..."
+
+                aws eks describe-cluster \
+                    --region ${AWS_DEFAULT_REGION} \
+                    --name ${EKS_CLUSTER} \
+                    --query 'cluster.status' \
+                    --output text
+            '''
+        }
+    }
+}
+
         /*
          * 13. DEPLOY TO EKS
          */
