@@ -230,102 +230,102 @@ pipeline {
         }
 
         /*
- * 13. DEPLOY TO EKS
- */
-stage('Deploy to EKS') {
+         * 13. DEPLOY TO EKS
+         */
+        stage('Deploy to EKS') {
 
-    options {
-        // Maximum time allowed for this stage.
-        // If deployment finishes in 15 minutes, Jenkins continues immediately.
-        timeout(time: 30, unit: 'MINUTES')
-    }
+            options {
+                timeout(time: 30, unit: 'MINUTES')
+            }
 
-    steps {
+            steps {
 
-        withCredentials([
-            usernamePassword(
-                credentialsId: 'aws_creds',
-                usernameVariable: 'AWS_ACCESS_KEY_ID',
-                passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-            )
-        ]) {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws_creds',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
 
-            sh '''
-                set -e
+                    sh '''
+                        set -e
 
-                echo "========================================="
-                echo "        DEPLOYING APPLICATION TO EKS"
-                echo "========================================="
+                        echo "========================================="
+                        echo "        DEPLOYING APPLICATION TO EKS"
+                        echo "========================================="
 
-                echo "AWS Region       : ${AWS_DEFAULT_REGION}"
-                echo "EKS Cluster      : ${EKS_CLUSTER}"
-                echo "ECR Registry     : ${ECR_REGISTRY}"
-                echo "ECR Repository   : ${ECR_REPOSITORY}"
-                echo "Image Tag        : ${BUILD_NUMBER}"
+                        echo "AWS Region       : ${AWS_DEFAULT_REGION}"
+                        echo "EKS Cluster      : ${EKS_CLUSTER}"
+                        echo "ECR Registry     : ${ECR_REGISTRY}"
+                        echo "ECR Repository   : ${ECR_REPOSITORY}"
+                        echo "Image Tag        : ${BUILD_NUMBER}"
 
-                echo ""
-                echo "Updating kubeconfig..."
+                        echo ""
+                        echo "Updating kubeconfig..."
 
-                aws eks update-kubeconfig \
-                    --region ${AWS_DEFAULT_REGION} \
-                    --name ${EKS_CLUSTER}
+                        aws eks update-kubeconfig \
+                            --region ${AWS_DEFAULT_REGION} \
+                            --name ${EKS_CLUSTER}
 
-                echo "Kubeconfig updated successfully."
+                        echo "Kubeconfig updated successfully."
 
-                echo ""
-                echo "Checking Kubernetes cluster..."
+                        echo ""
+                        echo "Checking Kubernetes cluster..."
 
-                kubectl get nodes
+                        kubectl get nodes
 
-                echo ""
-                echo "Updating deployment image..."
+                        echo ""
+                        echo "Updating deployment image..."
 
-                kubectl set image deployment/hotstar \
-                    hotstar=${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}
+                        kubectl set image deployment/hotstar \
+                            hotstar=${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}
 
-                echo ""
-                echo "Applying Kubernetes configuration..."
+                        echo ""
+                        echo "Applying Kubernetes configuration..."
 
-                kubectl apply -f deployment.yml
-                kubectl apply -f service.yml
+                        kubectl apply -f deployment.yml
+                        kubectl apply -f service.yml
 
-                echo ""
-                echo "Checking deployment rollout..."
+                        echo ""
+                        echo "Checking deployment rollout..."
 
-                kubectl rollout status deployment/hotstar \
-                    --timeout=10m
+                        kubectl rollout status deployment/hotstar \
+                            --timeout=10m
 
-                echo ""
-                echo "Checking pods..."
+                        echo ""
+                        echo "Checking pods..."
 
-                kubectl get pods
+                        kubectl get pods
 
-                echo ""
-                echo "Checking services..."
+                        echo ""
+                        echo "Checking services..."
 
-                kubectl get services
+                        kubectl get services
 
-                echo ""
-                echo "========================================="
-                echo "       EKS DEPLOYMENT SUCCESSFUL"
-                echo "========================================="
-            '''
+                        echo ""
+                        echo "========================================="
+                        echo "       EKS DEPLOYMENT SUCCESSFUL"
+                        echo "========================================="
+                    '''
+                }
+            }
         }
-    }
-}
+
+    }   // ✅ closes stages
 
 
-/*
- * EMAIL NOTIFICATION
- */
-post {
+    /*
+     * EMAIL NOTIFICATION
+     */
+    post {
 
-    success {
+        success {
 
-        emailext(
-            subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            emailext(
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
 
-            body: """
+                body: """
 Build Successful!
 
 =========================================
@@ -355,17 +355,17 @@ Deployment completed successfully.
 =========================================
 """,
 
-            to: "${RECIPIENTS}"
-        )
-    }
+                to: "${RECIPIENTS}"
+            )
+        }
 
 
-    failure {
+        failure {
 
-        emailext(
-            subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            emailext(
+                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
 
-            body: """
+                body: """
 Build Failed!
 
 =========================================
@@ -379,7 +379,7 @@ Build Number:
 ${env.BUILD_NUMBER}
 
 Docker Image:
-${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${env.BUILD_NUMBER}
+${env.ECR_REGISTRY}/${env.ECR_REPOSITORY}:${BUILD_NUMBER}
 
 EKS Cluster:
 ${env.EKS_CLUSTER}
@@ -387,7 +387,7 @@ ${env.EKS_CLUSTER}
 AWS Region:
 ${env.AWS_DEFAULT_REGION}
 
-Please check the Jenkins console output for
+Please check Jenkins console output for
 the exact error.
 
 Build URL:
@@ -396,9 +396,9 @@ ${env.BUILD_URL}
 =========================================
 """,
 
-            to: "${RECIPIENTS}"
-        )
+                to: "${RECIPIENTS}"
+            )
+        }
     }
-}
-    }
-}
+
+}   // ✅ closes pipeline
