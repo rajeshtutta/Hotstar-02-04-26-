@@ -229,6 +229,34 @@ pipeline {
             }
         }
 
+        stage('Install eksctl') {
+    steps {
+        sh '''
+            set -e
+
+            if command -v eksctl > /dev/null 2>&1
+            then
+                echo "eksctl is already installed."
+                eksctl version
+            else
+                echo "Installing eksctl..."
+
+                curl --silent --location \
+                    "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" \
+                    | tar xz -C /tmp
+
+                mkdir -p $HOME/bin
+                mv /tmp/eksctl $HOME/bin/eksctl
+
+                export PATH=$HOME/bin:$PATH
+
+                echo "eksctl installed successfully."
+                eksctl version
+            fi
+        '''
+    }
+}
+
              /*
  * 13. CREATE / VERIFY EKS CLUSTER
  */
