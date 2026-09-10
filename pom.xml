@@ -16,7 +16,7 @@
         <!-- ✅ SonarQube properties -->
         <sonar.projectKey>myapp</sonar.projectKey>
         <sonar.projectName>myapp</sonar.projectName>
-        <sonar.host.url>http://43.204.227.132:9000</sonar.host.url>
+        <sonar.host.url>http://15.207.112.248:9000</sonar.host.url>
         <!-- This picks token from Jenkins environment variable -->
         <sonar.login>${env.SONAR_AUTH_TOKEN}</sonar.login>
     </properties>
@@ -72,11 +72,11 @@
     <distributionManagement>
         <repository>
             <id>maven-releases</id>
-            <url>http://43.204.227.132:8081/repository/maven-releases/</url>    
+            <url>http://15.207.112.248:8081/repository/maven-releases/</url>    
         </repository>
         <snapshotRepository>
             <id>maven-snapshots</id>
-            <url>http://43.204.227.132:8081/repository/maven-snapshots/</url>
+            <url>http://15.207.112.248:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
